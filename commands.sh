@@ -42,5 +42,6 @@ if has "$allmsg" "^$BOTNAME:? !?help$" ; then
     say $chan "oh shit: whaddup?"
 fi
 
-if has "$allmsg" "^$BOTNAME:? !?source$:" ; then say $chan "Check me out at https://github.com/ReevesBot/dat_bot"
+if has "$allmsg" "^$BOTNAME:? !?source$" ; then 
+    say $chan "Check me out at https://github.com/ReevesBot/dat_bot"
 fi
