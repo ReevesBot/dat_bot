@@ -38,15 +38,17 @@ if has "$nick $allmsg" "Reeves !text" ; then
     say $chan "Message sent boss!"
 fi
 
-#Currently under construction
-#if has "$nick $allmsg" "Reeves !partysignal" ; then
-#    partymessage="$(echo "$allmsg" | cut -d ' ' -f 2-)"
-#    for i in party.txt; do
-#        partynumber=$(cut -d ' ' -f 2)
-#        say $chan "$partynumber"
-#        #echo "$partymessage" | ./twilio-sms.sh $partynumber
-#    done <party.txt
-#fi
+if has "$nick $allmsg" "Reeves !partysignal" ; then
+    partymessage="$(echo "$allmsg" | cut -d ' ' -f 2-)"
+    oldIFS="$IFS"
+    IFS=$'\n'
+    for i in $(cat party.txt); do
+        partynumber=$(echo $i | cut -d ' ' -f 2)
+        echo "$partymessage" | ./twilio-sms.sh $partynumber
+    done
+    say $chan "PARTY ALERT!"
+    IFS=$oldIFS
+fi
 
 if has "$allmsg" "^!weather" ; then
     place="$(weather)"
