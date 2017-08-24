@@ -21,13 +21,26 @@ function google {
 }
 
 function weather {
-    local city="$(echo "$allmsg" | cut -d ' ' -f 2)"
-    wget -O forecast.txt http://api.wunderground.com/api/488ca4f3da14f1c8/conditions/q/OR/$city.json
+    local city="$(echo "$allmsg" | cut -d ' ' -f 2-)"
+    local insert=${city// /%20}
+    say $chan "$insert"
+    wget -O forecast.txt http://api.wunderground.com/api/488ca4f3da14f1c8/conditions/q/$insert.json
 }
 
 function sevenday {
     local city="$(echo "$allmsg" | cut -d ' ' -f 2)"
-    wget -O sevenforecast.txt http://api.wunderground.com/api/488ca4f3da14f1c8/forecast10day/q/OR/$city.json
+    wget -O sevenforecast.txt http://api.wunderground.com/api/488ca4f3da14f1c8/forecast10day/q/$city.json
+}
+
+function stalker {
+    message="$(echo "$allmsg")"
+    {
+    if [ ! -f /u/sultan/bot_stuff/dat_bot/stalker/$nick.txt ] ; then
+        echo $message > /u/sultan/bot_stuff/dat_bot/stalker/$nick.txt
+    else
+        echo $message >> /u/sultan/bot_stuff/dat_bot/stalker/$nick.txt
+    fi
+    }
 }
 
 if has "$nick $allmsg" "Reeves !text" ; then
@@ -101,12 +114,27 @@ fi
 if has "$allmsg" "^i(')?m board$" ; then say $chan "Hi board! I'm dad_bot!"
 fi
 
+if has "$allmsg" ; then
+    $(stalker)
+    words="$(sed -e 's/[^[:alpha:]]/ /g' /u/sultan/bot_stuff/dat_bot/stalker/$nick.txt | tr '\n' " " |  tr -s " " | tr " " '\n'| tr 'A-Z' 'a-z' | sort | uniq -c | sort -nr | nl)" #> /u/sultan/bot_stuff/dat_bot/stalker/count_$nick.txt
+    new_words="${words//[0-9]/}"
+    echo $new_words > /u/sultan/bot_stuff/dat_bot/stalker/count_$nick.txt
+fi
+
+if has "$allmsg" "^!wordcount$" ; then
+    number1="$(sed -ne 1p /u/sultan/bot_stuff/dat_bot/stalker/count_$nick.txt | cut -d ' ' -f 1)"
+    number2="$(sed -ne 1p  /u/sultan/bot_stuff/dat_bot/stalker/count_$nick.txt | cut -d ' ' -f 2)"
+    number3="$(sed -ne 1p /u/sultan/bot_stuff/dat_bot/stalker/count_$nick.txt | cut -d ' ' -f 3)"
+    say $chan "Hey $nick, it looks like your most used word is $number1, followed by $number2 and $number3"
+fi
+
 if has "$allmsg" "^$BOTNAME:? !?help$" ; then 
     say $chan "I'm bored: Random wikipedia article" 
     say $chan "!google fubar: Returns first google result" 
     say $chan "oh shit: whaddup?"
-    say $chan "!weather *city: Returns todays weather"
-    say $chan "!7day *city: Returns seven day forecast"
+    say $chan "!weather *zipcode* or *city* *state*: Returns todays weather"
+    say $chan "!7day *zipcode* or *city* *state*: Returns seven day forecast"
+    say $chan "!wordcount: Shows your most used words from all the channels I sit in"
 fi
 
 if has "$allmsg" "^$BOTNAME:? !?source$" ; then 

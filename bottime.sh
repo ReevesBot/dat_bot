@@ -20,9 +20,13 @@ tail -f .botfile | openssl s_client -connect irc.cat.pdx.edu:6697 | while true ;
         send "USER $botname 0 0 :$botname"
         send "NICK $botname"
         send "JOIN #robots $cat_chankey"
+        send "JOIN #zombies $cat_chankey"
+        send "JOIN #tabletop"
+        send "JOIN #dragons $cat_chankey"
         send "JOIN #necromancers $cat_chankey"
         send "JOIN #meow $cat_chankey"
         send "JOIN #Reeves $my_chankey"    
+        send "JOIN #catafterdark $dark_chankey"
         started="yes"
     fi
 
